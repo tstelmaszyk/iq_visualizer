@@ -101,6 +101,9 @@ class VisualizerConfig:
   toujours calculé sur le signal complet ou sur `nfft`.
 - `output_html` : si renseigné, la figure est aussi sauvegardée en HTML.
 - Les colonnes sont désignées par index (fonctionne avec ou sans en-tête).
+- Validation dans `__post_init__` (`ValueError`) : `sample_rate`, `nfft` et
+  `max_plot_samples` strictement positifs ; index de colonnes positifs et
+  I ≠ Q.
 
 ### 3.2 `sources.py`
 
@@ -116,16 +119,19 @@ class CsvIQSource(IQSource):
     def read(self) -> np.ndarray: ...
 ```
 
-`CsvIQSource.read()` utilise `pd.read_csv` avec `sep`, `decimal`,
-`header=0 if has_header else None` et `usecols=[i_column, q_column]`, puis
-renvoie `I + 1j * Q`.
+`CsvIQSource.read()` utilise `pd.read_csv` avec `sep`, `decimal` et
+`header=0 if has_header else None`, sélectionne les colonnes par position
+(`iloc[:, [i_column, q_column]]`, car `usecols` ne respecte pas l'ordre
+demandé), puis renvoie `I + 1j * Q`.
 
 Erreurs :
 
 - fichier absent : `FileNotFoundError` natif ;
 - fichier vide : `ValueError` explicite ;
+- pas assez de colonnes : `ValueError` suggérant de vérifier le séparateur ;
 - colonnes non numériques : `ValueError` explicite, avec une indication sur
-  les causes probables (mauvais séparateur, en-tête non déclaré).
+  les causes probables (mauvais séparateur, en-tête non déclaré) ;
+- en-tête seul (aucun échantillon) ou valeurs manquantes : `ValueError`.
 
 ### 3.3 `processing.py`
 
@@ -158,7 +164,9 @@ def compute_spectrum(
    donne un pic à 1 (linéaire), soit 0 dB.
 5. Échelle : `"linear"` → `|X|` ; `"db"` → `20·log10(max(|X|, 1e-12))`.
 
-Erreurs (`ValueError`) : signal vide, fenêtre inconnue, échelle inconnue.
+Erreurs (`ValueError`) : signal vide, fenêtre inconnue, échelle inconnue,
+signal trop court pour la fenêtre (somme des poids nulle, ex. Hann sur 2
+échantillons).
 
 ### 3.4 `plotting.py`
 
@@ -176,14 +184,16 @@ Trois fonctions privées (`_add_time_traces`, `_add_constellation`,
 `_add_spectrum`) gardent `build_figure` courte. Libellés d'axes selon la
 configuration : « Temps (s) » / « Échantillon », « Fréquence (Hz) » /
 « Fréquence normalisée », « Magnitude (dB) » / « Magnitude ».
-`build_figure` construit la figure sans l'afficher.
+`build_figure` construit la figure sans l'afficher. Les traces utilisent
+`go.Scattergl` (WebGL) pour rester fluides quand le spectre porte sur un
+signal long.
 
 ### 3.5 `main.py`
 
 ```python
 def parse_args(argv: Optional[List[str]] = None) -> Tuple[CsvConfig, VisualizerConfig]: ...
 def run(source: IQSource, config: VisualizerConfig) -> None: ...
-def main() -> None: ...
+def main(argv: Optional[List[str]] = None) -> int: ...
 ```
 
 Utilisation :
@@ -197,12 +207,14 @@ python -m iq_visualizer.main FICHIER [--sep SEP] [--decimal DEC] [--header]
 
 - Les valeurs par défaut d'argparse sont lues dans les dataclasses (pas de
   duplication).
+- `--header/--no-header` (`argparse.BooleanOptionalAction`, Python 3.9+).
 - `--sep` accepte les alias `comma`, `semicolon`, `tab`, `space` (→ `r"\s+"`)
   ou un séparateur brut.
 - `run()` : `source.read()` → `build_figure()` → `fig.show()` et, si
   `output_html` est renseigné, `fig.write_html()`.
-- `main()` intercepte `FileNotFoundError` et `ValueError` : message sur
-  stderr, code de sortie 1, sans traceback.
+- `main()` intercepte `FileNotFoundError` et `ValueError` (y compris ceux de
+  la validation des dataclasses) : message sur stderr, code de sortie 1, sans
+  traceback. Il renvoie 0 en cas de succès.
 
 ## 4. Tests (pytest)
 
