@@ -1,4 +1,4 @@
-"""Paramètres de lecture CSV et de visualisation."""
+"""CSV reading and visualization settings."""
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -7,37 +7,37 @@ from typing import Literal, Optional
 
 @dataclass
 class CsvConfig:
-    """Paramètres de lecture d'un fichier CSV contenant des colonnes I et Q."""
+    """Settings for reading a CSV file containing I and Q columns."""
 
     path: Path
-    separator: str = ","      # ",", ";", "\t", r"\s+" (espaces)
-    decimal: str = "."        # "," pour les CSV "à la française"
+    separator: str = ","      # ",", ";", "\t", r"\s+" (whitespace)
+    decimal: str = "."        # "," for European-style CSV files
     has_header: bool = False
-    i_column: int = 0         # index de la colonne I
-    q_column: int = 1         # index de la colonne Q
+    i_column: int = 0         # index of the I column
+    q_column: int = 1         # index of the Q column
 
     def __post_init__(self) -> None:
         if self.i_column < 0 or self.q_column < 0:
-            raise ValueError("Les index de colonnes doivent être positifs.")
+            raise ValueError("Column indices must be non-negative.")
         if self.i_column == self.q_column:
-            raise ValueError("Les colonnes I et Q doivent être différentes.")
+            raise ValueError("The I and Q columns must be different.")
 
 
 @dataclass
 class VisualizerConfig:
-    """Paramètres d'analyse et d'affichage."""
+    """Analysis and display settings."""
 
-    sample_rate: Optional[float] = None   # Hz ; None → échantillons
-    nfft: Optional[int] = None            # None → tout le signal
+    sample_rate: Optional[float] = None   # Hz; None → samples
+    nfft: Optional[int] = None            # None → whole signal
     window: Literal["hann", "rectangular"] = "hann"
     scale: Literal["db", "linear"] = "db"
-    max_plot_samples: int = 10_000        # points tracés (temps, IQ)
-    output_html: Optional[Path] = None    # sauvegarde optionnelle
+    max_plot_samples: int = 10_000        # plotted points (time, IQ)
+    output_html: Optional[Path] = None    # optional output file
 
     def __post_init__(self) -> None:
         if self.sample_rate is not None and self.sample_rate <= 0:
-            raise ValueError("La fréquence d'échantillonnage doit être > 0.")
+            raise ValueError("The sample rate must be > 0.")
         if self.nfft is not None and self.nfft <= 0:
-            raise ValueError("nfft doit être > 0.")
+            raise ValueError("nfft must be > 0.")
         if self.max_plot_samples <= 0:
-            raise ValueError("max_plot_samples doit être > 0.")
+            raise ValueError("max_plot_samples must be > 0.")

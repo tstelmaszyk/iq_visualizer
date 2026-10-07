@@ -74,8 +74,8 @@ def test_single_sample_signal_is_supported():
 
 
 @pytest.mark.parametrize("kwargs, message", [
-    ({"window": "blackman"}, "Fenêtre"),
-    ({"scale": "power"}, "Échelle"),
+    ({"window": "blackman"}, "Unknown window"),
+    ({"scale": "power"}, "Unknown scale"),
 ])
 def test_unknown_option_is_rejected(kwargs, message):
     with pytest.raises(ValueError, match=message):
@@ -83,10 +83,10 @@ def test_unknown_option_is_rejected(kwargs, message):
 
 
 def test_empty_signal_is_rejected():
-    with pytest.raises(ValueError, match="vide"):
+    with pytest.raises(ValueError, match="empty"):
         compute_spectrum(np.array([], dtype=complex))
 
 
 def test_signal_too_short_for_hann_is_rejected():
-    with pytest.raises(ValueError, match="trop court"):
+    with pytest.raises(ValueError, match="too short"):
         compute_spectrum(np.ones(2, dtype=complex), window="hann")

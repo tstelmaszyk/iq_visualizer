@@ -1,1 +1,1 @@
-"""Visualisation d'échantillons IQ : temps, constellation et spectre."""
+"""IQ sample visualization: time, constellation and spectrum."""

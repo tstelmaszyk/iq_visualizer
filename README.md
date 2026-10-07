@@ -1,59 +1,59 @@
 # IQ Visualizer
 
-Visualise des échantillons IQ lus dans un fichier CSV : I/Q en fonction du
-temps, constellation et spectre (dB ou magnitude linéaire), dans une figure
-Plotly interactive ouverte dans le navigateur.
+Visualizes IQ samples read from a CSV file: I/Q over time, constellation and
+spectrum (dB or linear magnitude), in an interactive Plotly figure opened in
+the browser.
 
-Compatible Python 3.8+.
+Compatible with Python 3.8+.
 
 ## Installation
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt        # utilisation
-.venv/bin/pip install -r requirements-dev.txt    # développement (tests, flake8)
+.venv/bin/pip install -r requirements.txt        # usage
+.venv/bin/pip install -r requirements-dev.txt    # development (tests, flake8)
 ```
 
-## Utilisation
+## Usage
 
 ```bash
 .venv/bin/python -m iq_visualizer.main examples/sample.csv --fs 1e6
 ```
 
-Le fichier CSV contient une ligne par échantillon, avec une colonne I et une
-colonne Q.
+The CSV file contains one row per sample, with an I column and a Q column.
 
-| Option | Rôle | Défaut |
+| Option | Purpose | Default |
 |---|---|---|
-| `--sep` | séparateur : `comma`, `semicolon`, `tab`, `space` ou caractère brut | `,` |
-| `--decimal` | séparateur décimal | `.` |
-| `--header` | la première ligne est un en-tête | non |
-| `--i-col`, `--q-col` | index des colonnes I et Q | `0`, `1` |
-| `--fs` | fréquence d'échantillonnage (Hz) | aucune (échantillons, fréquence normalisée) |
-| `--nfft` | taille de la FFT | tout le signal |
-| `--window` | `hann` ou `rectangular` | `hann` |
-| `--scale` | `db` ou `linear` | `db` |
-| `--max-points` | points tracés en temps et constellation | `10000` |
-| `--save` | sauvegarde la figure en HTML | aucune |
+| `--sep` | separator: `comma`, `semicolon`, `tab`, `space` or a raw character | `,` |
+| `--decimal` | decimal separator | `.` |
+| `--header` | the first row is a header | no |
+| `--i-col`, `--q-col` | indices of the I and Q columns | `0`, `1` |
+| `--fs` | sample rate (Hz) | none (samples, normalized frequency) |
+| `--nfft` | FFT size | whole signal |
+| `--window` | `hann` or `rectangular` | `hann` |
+| `--scale` | `db` or `linear` | `db` |
+| `--max-points` | points plotted in the time and constellation views | `10000` |
+| `--save` | save the figure as HTML | none |
 
-Exemple pour un CSV « à la française » avec en-tête :
+Example for a European-style CSV (semicolon separator, decimal comma) with a
+header:
 
 ```bash
-.venv/bin/python -m iq_visualizer.main mesure.csv --sep semicolon --decimal "," --header --fs 2.4e6
+.venv/bin/python -m iq_visualizer.main measurement.csv --sep semicolon --decimal "," --header --fs 2.4e6
 ```
 
-Les valeurs par défaut se changent dans `iq_visualizer/config.py`.
+Default values can be changed in `iq_visualizer/config.py`.
 
-## Échelle du spectre
+## Spectrum scale
 
-Le spectre est normalisé : une sinusoïde complexe d'amplitude 1 donne un pic
-à 1 en linéaire, soit 0 dB.
+The spectrum is normalized: a complex sinusoid of amplitude 1 gives a peak of
+1 in linear scale, i.e. 0 dB.
 
-## Ajouter une source d'IQ
+## Adding an IQ source
 
-Hériter de `IQSource` (`iq_visualizer/sources.py`) et implémenter `read()`,
-qui renvoie un tableau numpy 1D complexe, puis la passer à
-`iq_visualizer.main.run()` :
+Inherit from `IQSource` (`iq_visualizer/sources.py`) and implement `read()`,
+which returns a 1D complex numpy array, then pass it to
+`iq_visualizer.main.run()`:
 
 ```python
 class BinaryIQSource(IQSource):

@@ -44,27 +44,27 @@ def test_reads_non_contiguous_columns_in_requested_order(tmp_path):
 
 
 def test_undeclared_header_gives_explicit_error(tmp_path):
-    with pytest.raises(ValueError, match="numériques"):
+    with pytest.raises(ValueError, match="not numeric"):
         read_csv_text(tmp_path, "I,Q\n1,2\n")
 
 
 def test_wrong_separator_gives_explicit_error(tmp_path):
-    with pytest.raises(ValueError, match="séparateur"):
+    with pytest.raises(ValueError, match="separator"):
         read_csv_text(tmp_path, "1;2\n3;4\n")
 
 
 def test_empty_file_gives_explicit_error(tmp_path):
-    with pytest.raises(ValueError, match="vide"):
+    with pytest.raises(ValueError, match="empty"):
         read_csv_text(tmp_path, "")
 
 
 def test_header_only_file_gives_explicit_error(tmp_path):
-    with pytest.raises(ValueError, match="Aucun échantillon"):
+    with pytest.raises(ValueError, match="No samples"):
         read_csv_text(tmp_path, "I,Q\n", has_header=True)
 
 
 def test_missing_value_gives_explicit_error(tmp_path):
-    with pytest.raises(ValueError, match="manquantes"):
+    with pytest.raises(ValueError, match="Missing"):
         read_csv_text(tmp_path, "1,2\n3,\n")
 
 
@@ -75,5 +75,5 @@ def test_missing_file_raises_file_not_found(tmp_path):
 
 
 def test_infinite_value_gives_explicit_error(tmp_path):
-    with pytest.raises(ValueError, match="infinies"):
+    with pytest.raises(ValueError, match="infinite"):
         read_csv_text(tmp_path, "1,2\n3,inf\n")

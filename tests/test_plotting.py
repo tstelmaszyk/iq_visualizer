@@ -8,7 +8,7 @@ def test_figure_has_time_constellation_and_spectrum_traces():
     iq = np.exp(2j * np.pi * 0.1 * np.arange(64))
     figure = build_figure(iq, VisualizerConfig())
     names = [trace.name for trace in figure.data]
-    assert names == ["I", "Q", "Constellation", "Spectre"]
+    assert names == ["I", "Q", "Constellation", "Spectrum"]
 
 
 def test_time_and_constellation_respect_max_plot_samples():
@@ -16,7 +16,7 @@ def test_time_and_constellation_respect_max_plot_samples():
     figure = build_figure(iq, VisualizerConfig(max_plot_samples=100))
     i_trace, q_trace, constellation, spectrum = figure.data
     assert len(i_trace.x) == len(q_trace.x) == len(constellation.x) == 100
-    assert len(spectrum.x) == 500  # spectre sur tout le signal
+    assert len(spectrum.x) == 500  # spectrum over the whole signal
 
 
 def test_signal_shorter_than_max_plot_samples_is_fully_plotted():
@@ -29,11 +29,11 @@ def test_axis_labels_follow_configuration():
     iq = np.ones(16, dtype=complex)
     with_fs = build_figure(iq, VisualizerConfig(sample_rate=1e3,
                                                 scale="linear"))
-    assert with_fs.layout.xaxis.title.text == "Temps (s)"
-    assert with_fs.layout.xaxis3.title.text == "Fréquence (Hz)"
+    assert with_fs.layout.xaxis.title.text == "Time (s)"
+    assert with_fs.layout.xaxis3.title.text == "Frequency (Hz)"
     assert with_fs.layout.yaxis3.title.text == "Magnitude"
 
     without_fs = build_figure(iq, VisualizerConfig())
-    assert without_fs.layout.xaxis.title.text == "Échantillon"
-    assert without_fs.layout.xaxis3.title.text == "Fréquence normalisée"
+    assert without_fs.layout.xaxis.title.text == "Sample"
+    assert without_fs.layout.xaxis3.title.text == "Normalized frequency"
     assert without_fs.layout.yaxis3.title.text == "Magnitude (dB)"

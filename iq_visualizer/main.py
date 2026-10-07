@@ -1,6 +1,6 @@
-"""Point d'entrée en ligne de commande.
+"""Command line entry point.
 
-Exemple :
+Example:
     python -m iq_visualizer.main data.csv --sep semicolon --fs 1e6
 """
 
@@ -24,7 +24,7 @@ SEPARATOR_ALIASES = {
 
 
 def _defaults(config_class: type) -> Dict[str, Any]:
-    """Valeurs par défaut d'une dataclass (source unique des défauts)."""
+    """Default values of a dataclass (single source of defaults)."""
     return {field.name: field.default for field in fields(config_class)
             if field.default is not MISSING}
 
@@ -32,44 +32,44 @@ def _defaults(config_class: type) -> Dict[str, Any]:
 def parse_args(
     argv: Optional[List[str]] = None,
 ) -> Tuple[CsvConfig, VisualizerConfig]:
-    """Construit les configurations à partir de la ligne de commande."""
+    """Builds the configurations from the command line."""
     csv_defaults = _defaults(CsvConfig)
     vis_defaults = _defaults(VisualizerConfig)
 
     parser = argparse.ArgumentParser(
-        description="Visualise des échantillons IQ lus dans un fichier CSV.")
+        description="Visualizes IQ samples read from a CSV file.")
     parser.add_argument("path", type=Path,
-                        help="fichier CSV contenant les colonnes I et Q")
+                        help="CSV file containing the I and Q columns")
     parser.add_argument("--sep", default=csv_defaults["separator"],
-                        help="séparateur : comma, semicolon, tab, space "
-                             "ou caractère brut (défaut : %(default)r)")
+                        help="separator: comma, semicolon, tab, space "
+                             "or a raw character (default: %(default)r)")
     parser.add_argument("--decimal", default=csv_defaults["decimal"],
-                        help="séparateur décimal (défaut : %(default)r)")
+                        help="decimal separator (default: %(default)r)")
     parser.add_argument("--header", action="store_true",
                         default=csv_defaults["has_header"],
-                        help="la première ligne est un en-tête")
+                        help="the first row is a header")
     parser.add_argument("--i-col", type=int,
                         default=csv_defaults["i_column"],
-                        help="index de la colonne I (défaut : %(default)s)")
+                        help="index of the I column (default: %(default)s)")
     parser.add_argument("--q-col", type=int,
                         default=csv_defaults["q_column"],
-                        help="index de la colonne Q (défaut : %(default)s)")
+                        help="index of the Q column (default: %(default)s)")
     parser.add_argument("--fs", type=float,
                         default=vis_defaults["sample_rate"],
-                        help="fréquence d'échantillonnage en Hz")
+                        help="sample rate in Hz")
     parser.add_argument("--nfft", type=int, default=vis_defaults["nfft"],
-                        help="taille de la FFT (défaut : tout le signal)")
+                        help="FFT size (default: whole signal)")
     parser.add_argument("--window", choices=sorted(WINDOWS),
                         default=vis_defaults["window"])
     parser.add_argument("--scale", choices=SCALES,
                         default=vis_defaults["scale"])
     parser.add_argument("--max-points", type=int,
                         default=vis_defaults["max_plot_samples"],
-                        help="points tracés en temps et constellation "
-                             "(défaut : %(default)s)")
+                        help="points plotted in the time and constellation "
+                             "views (default: %(default)s)")
     parser.add_argument("--save", type=Path,
                         default=vis_defaults["output_html"],
-                        help="sauvegarde la figure dans ce fichier HTML")
+                        help="save the figure to this HTML file")
     args = parser.parse_args(argv)
 
     csv_config = CsvConfig(
@@ -92,7 +92,7 @@ def parse_args(
 
 
 def run(source: IQSource, config: VisualizerConfig) -> None:
-    """Lit la source, construit la figure, la sauvegarde et l'affiche."""
+    """Reads the source, builds the figure, saves and shows it."""
     iq = source.read()
     figure = build_figure(iq, config)
     if config.output_html is not None:
@@ -101,12 +101,12 @@ def run(source: IQSource, config: VisualizerConfig) -> None:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
-    """Renvoie le code de sortie du programme."""
+    """Returns the program exit code."""
     try:
         csv_config, vis_config = parse_args(argv)
         run(CsvIQSource(csv_config), vis_config)
     except (OSError, ValueError) as error:
-        print(f"Erreur : {error}", file=sys.stderr)
+        print(f"Error: {error}", file=sys.stderr)
         return 1
     return 0
 

@@ -16,7 +16,7 @@ class FakeSource(IQSource):
 
 @pytest.fixture
 def no_browser(monkeypatch):
-    """Empêche fig.show() d'ouvrir un navigateur pendant les tests."""
+    """Prevents fig.show() from opening a browser during tests."""
     shown = []
     monkeypatch.setattr(go.Figure, "show", lambda self: shown.append(self))
     return shown
@@ -67,14 +67,14 @@ def test_main_runs_on_a_csv_file(tmp_path, no_browser):
 
 def test_main_reports_missing_file_without_traceback(tmp_path, capsys):
     assert main([str(tmp_path / "absent.csv")]) == 1
-    assert "Erreur" in capsys.readouterr().err
+    assert "Error" in capsys.readouterr().err
 
 
 def test_main_reports_invalid_option_value(tmp_path, capsys):
     assert main([str(tmp_path / "iq.csv"), "--fs", "0"]) == 1
-    assert "Erreur" in capsys.readouterr().err
+    assert "Error" in capsys.readouterr().err
 
 
 def test_main_reports_os_errors_without_traceback(tmp_path, capsys):
-    assert main([str(tmp_path)]) == 1  # un dossier au lieu d'un fichier
-    assert "Erreur" in capsys.readouterr().err
+    assert main([str(tmp_path)]) == 1  # a directory instead of a file
+    assert "Error" in capsys.readouterr().err
