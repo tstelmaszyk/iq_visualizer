@@ -45,7 +45,7 @@ def parse_args(
                              "ou caractère brut (défaut : %(default)r)")
     parser.add_argument("--decimal", default=csv_defaults["decimal"],
                         help="séparateur décimal (défaut : %(default)r)")
-    parser.add_argument("--header", action=argparse.BooleanOptionalAction,
+    parser.add_argument("--header", action="store_true",
                         default=csv_defaults["has_header"],
                         help="la première ligne est un en-tête")
     parser.add_argument("--i-col", type=int,

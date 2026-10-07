@@ -13,7 +13,8 @@ un fichier CSV, sous trois vues :
 
 ### Contraintes
 
-- Python 3.9 minimum (pas de syntaxe `X | None`, pas de `match`).
+- Python 3.8 minimum (pas de syntaxe `X | None`, pas de `match`, pas de
+  `argparse.BooleanOptionalAction`).
 - PEP 8, vérifié par `flake8`.
 - Bibliothèques reconnues uniquement : numpy, pandas, plotly (pytest et
   flake8 pour le développement).
@@ -207,7 +208,7 @@ python -m iq_visualizer.main FICHIER [--sep SEP] [--decimal DEC] [--header]
 
 - Les valeurs par défaut d'argparse sont lues dans les dataclasses (pas de
   duplication).
-- `--header/--no-header` (`argparse.BooleanOptionalAction`, Python 3.9+).
+- `--header` (`action="store_true"`, compatible Python 3.8).
 - `--sep` accepte les alias `comma`, `semicolon`, `tab`, `space` (→ `r"\s+"`)
   ou un séparateur brut.
 - `run()` : `source.read()` → `build_figure()` → `fig.show()` et, si
@@ -233,4 +234,4 @@ python -m iq_visualizer.main FICHIER [--sep SEP] [--decimal DEC] [--header]
   ouvrir de navigateur).
 
 Vérifications finales : `pytest` et `flake8` passent ; la suite de tests est
-exécutée sous Python 3.9 (via `uv` si disponible).
+exécutée sous Python 3.8 et 3.9 (via `uv`).

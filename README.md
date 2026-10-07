@@ -4,7 +4,7 @@ Visualise des échantillons IQ lus dans un fichier CSV : I/Q en fonction du
 temps, constellation et spectre (dB ou magnitude linéaire), dans une figure
 Plotly interactive ouverte dans le navigateur.
 
-Compatible Python 3.9+.
+Compatible Python 3.8+.
 
 ## Installation
 
@@ -27,7 +27,7 @@ colonne Q.
 |---|---|---|
 | `--sep` | séparateur : `comma`, `semicolon`, `tab`, `space` ou caractère brut | `,` |
 | `--decimal` | séparateur décimal | `.` |
-| `--header` / `--no-header` | la première ligne est un en-tête | non |
+| `--header` | la première ligne est un en-tête | non |
 | `--i-col`, `--q-col` | index des colonnes I et Q | `0`, `1` |
 | `--fs` | fréquence d'échantillonnage (Hz) | aucune (échantillons, fréquence normalisée) |
 | `--nfft` | taille de la FFT | tout le signal |
