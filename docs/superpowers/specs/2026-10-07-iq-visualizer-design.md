@@ -131,7 +131,7 @@ Erreurs :
 - pas assez de colonnes : `ValueError` suggérant de vérifier le séparateur ;
 - colonnes non numériques : `ValueError` explicite, avec une indication sur
   les causes probables (mauvais séparateur, en-tête non déclaré) ;
-- en-tête seul (aucun échantillon) ou valeurs manquantes : `ValueError`.
+- en-tête seul (aucun échantillon), valeurs manquantes ou infinies : `ValueError`.
 
 ### 3.3 `processing.py`
 
@@ -212,7 +212,7 @@ python -m iq_visualizer.main FICHIER [--sep SEP] [--decimal DEC] [--header]
   ou un séparateur brut.
 - `run()` : `source.read()` → `build_figure()` → `fig.show()` et, si
   `output_html` est renseigné, `fig.write_html()`.
-- `main()` intercepte `FileNotFoundError` et `ValueError` (y compris ceux de
+- `main()` intercepte `OSError` (fichier absent, dossier, droits…) et `ValueError` (y compris ceux de
   la validation des dataclasses) : message sur stderr, code de sortie 1, sans
   traceback. Il renvoie 0 en cas de succès.
 

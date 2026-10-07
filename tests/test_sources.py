@@ -72,3 +72,8 @@ def test_missing_file_raises_file_not_found(tmp_path):
     source = CsvIQSource(CsvConfig(path=tmp_path / "absent.csv"))
     with pytest.raises(FileNotFoundError):
         source.read()
+
+
+def test_infinite_value_gives_explicit_error(tmp_path):
+    with pytest.raises(ValueError, match="infinies"):
+        read_csv_text(tmp_path, "1,2\n3,inf\n")

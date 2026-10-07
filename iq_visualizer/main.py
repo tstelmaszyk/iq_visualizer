@@ -105,7 +105,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         csv_config, vis_config = parse_args(argv)
         run(CsvIQSource(csv_config), vis_config)
-    except (FileNotFoundError, ValueError) as error:
+    except (OSError, ValueError) as error:
         print(f"Erreur : {error}", file=sys.stderr)
         return 1
     return 0

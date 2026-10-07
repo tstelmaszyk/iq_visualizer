@@ -73,3 +73,8 @@ def test_main_reports_missing_file_without_traceback(tmp_path, capsys):
 def test_main_reports_invalid_option_value(tmp_path, capsys):
     assert main([str(tmp_path / "iq.csv"), "--fs", "0"]) == 1
     assert "Erreur" in capsys.readouterr().err
+
+
+def test_main_reports_os_errors_without_traceback(tmp_path, capsys):
+    assert main([str(tmp_path)]) == 1  # un dossier au lieu d'un fichier
+    assert "Erreur" in capsys.readouterr().err

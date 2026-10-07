@@ -55,9 +55,9 @@ class CsvIQSource(IQSource):
                 f"Les colonnes I/Q de {cfg.path} ne sont pas numériques. "
                 f"Vérifier le séparateur, la décimale et l'option d'en-tête."
             )
-        if columns.isna().to_numpy().any():
-            raise ValueError(f"Valeurs manquantes dans {cfg.path}.")
+        values = columns.to_numpy(dtype=float)
+        if not np.isfinite(values).all():
+            raise ValueError(
+                f"Valeurs manquantes ou infinies dans {cfg.path}.")
 
-        i_values = columns.iloc[:, 0].to_numpy(dtype=float)
-        q_values = columns.iloc[:, 1].to_numpy(dtype=float)
-        return i_values + 1j * q_values
+        return values[:, 0] + 1j * values[:, 1]
