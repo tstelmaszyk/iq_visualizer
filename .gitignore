@@ -4,3 +4,4 @@ __pycache__/
 *.html
 examples/
 .DS_Store
+*.pdf
