@@ -1,7 +1,7 @@
 import numpy as np
 
 from iq_visualizer.config import VisualizerConfig
-from iq_visualizer.plotting import build_figure
+from iq_visualizer.plotting import PAPER_COLOR, PLOT_COLOR, build_figure
 
 
 def test_figure_has_time_constellation_and_spectrum_traces():
@@ -37,3 +37,16 @@ def test_axis_labels_follow_configuration():
     assert without_fs.layout.xaxis.title.text == "Sample"
     assert without_fs.layout.xaxis3.title.text == "Normalized frequency"
     assert without_fs.layout.yaxis3.title.text == "Magnitude (dB)"
+
+
+def test_figure_uses_dark_blue_theme():
+    figure = build_figure(np.ones(16, dtype=complex), VisualizerConfig())
+    assert figure.layout.paper_bgcolor == PAPER_COLOR
+    assert figure.layout.plot_bgcolor == PLOT_COLOR
+
+
+def test_constellation_markers_are_enlarged():
+    figure = build_figure(np.ones(16, dtype=complex), VisualizerConfig())
+    constellation = figure.data[2]
+    assert constellation.marker.size == 6
+    assert constellation.marker.opacity == 0.6

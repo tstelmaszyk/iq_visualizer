@@ -11,6 +11,11 @@ from iq_visualizer.config import VisualizerConfig
 from iq_visualizer.processing import compute_spectrum, time_axis
 from iq_visualizer.tone_check import Gap
 
+# Dark theme: very dark blue background.
+PAPER_COLOR = "#0b1426"   # around the plots
+PLOT_COLOR = "#101d36"    # plot areas, slightly lighter
+GRID_COLOR = "#22324f"
+
 
 def build_figure(iq: np.ndarray, config: VisualizerConfig,
                  gaps: Optional[List[Gap]] = None) -> go.Figure:
@@ -37,7 +42,10 @@ def build_figure(iq: np.ndarray, config: VisualizerConfig,
     _add_spectrum(figure, iq, config)
     if gaps is not None:
         gap_plotting.add_gap_view(figure, iq, gaps, config, row=3)
-    figure.update_layout(height=400 * len(specs), template="plotly_white")
+    figure.update_layout(height=400 * len(specs), template="plotly_dark",
+                         paper_bgcolor=PAPER_COLOR, plot_bgcolor=PLOT_COLOR)
+    figure.update_xaxes(gridcolor=GRID_COLOR, zerolinecolor=GRID_COLOR)
+    figure.update_yaxes(gridcolor=GRID_COLOR, zerolinecolor=GRID_COLOR)
     return figure
 
 
@@ -57,7 +65,7 @@ def _add_time_traces(figure: go.Figure, iq: np.ndarray,
 def _add_constellation(figure: go.Figure, iq: np.ndarray) -> None:
     figure.add_trace(
         go.Scattergl(x=iq.real, y=iq.imag, mode="markers",
-                     marker={"size": 3}, name="Constellation"),
+                     marker={"size": 6, "opacity": 0.6}, name="Constellation"),
         row=1, col=2,
     )
     figure.update_xaxes(title_text="I", row=1, col=2)
