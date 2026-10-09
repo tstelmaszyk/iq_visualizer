@@ -22,6 +22,12 @@ def test_each_gap_is_highlighted_in_samples():
     assert spans == [(10, 12), (300, 301)]
 
 
+def test_gap_highlight_has_a_visible_border():
+    iq = np.ones(500, dtype=complex)
+    figure = build_figure(iq, VisualizerConfig(), gaps=[Gap(10, 11)])
+    assert figure.layout.shapes[0].line.width >= 3
+
+
 def test_gaps_are_highlighted_in_seconds_when_sample_rate_is_known():
     iq = np.ones(500, dtype=complex)
     figure = build_figure(iq, VisualizerConfig(sample_rate=100.0),

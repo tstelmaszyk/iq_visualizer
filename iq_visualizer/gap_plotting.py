@@ -14,6 +14,8 @@ from iq_visualizer.processing import time_axis
 from iq_visualizer.tone_check import Gap
 
 TITLE = "Tone gaps"
+# Border in pixels: keeps a short gap visible when the whole signal is shown
+GAP_LINE_WIDTH = 3
 
 
 def add_gap_view(figure: go.Figure, iq: np.ndarray, gaps: List[Gap],
@@ -28,8 +30,8 @@ def add_gap_view(figure: go.Figure, iq: np.ndarray, gaps: List[Gap],
     scale = 1.0 if config.sample_rate is None else 1.0 / config.sample_rate
     for gap in gaps:
         figure.add_vrect(x0=gap.start * scale, x1=gap.stop * scale,
-                         fillcolor="red", opacity=0.3, line_width=0,
-                         row=row, col=1)
+                         fillcolor="red", opacity=0.5, line_color="red",
+                         line_width=GAP_LINE_WIDTH, row=row, col=1)
 
     x_label = "Sample" if config.sample_rate is None else "Time (s)"
     figure.update_xaxes(title_text=x_label, row=row, col=1)
