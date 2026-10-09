@@ -1,27 +1,43 @@
 """Plotly figure construction: time, constellation, spectrum."""
 
+from typing import List, Optional
+
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from iq_visualizer import gap_plotting
 from iq_visualizer.config import VisualizerConfig
 from iq_visualizer.processing import compute_spectrum, time_axis
+from iq_visualizer.tone_check import Gap
 
 
-def build_figure(iq: np.ndarray, config: VisualizerConfig) -> go.Figure:
-    """Builds the figure (without showing it)."""
+def build_figure(iq: np.ndarray, config: VisualizerConfig,
+                 gaps: Optional[List[Gap]] = None) -> go.Figure:
+    """Builds the figure (without showing it).
+
+    With `gaps` (tone check result), a gap view is added as a third row.
+    """
+    specs = [[{}, {}], [{"colspan": 2}, None]]
+    titles = ["I / Q", "Constellation", "Spectrum"]
+    if gaps is not None:
+        specs.append([{"colspan": 2}, None])
+        titles.append(gap_plotting.TITLE)
+
     figure = make_subplots(
-        rows=2,
+        rows=len(specs),
         cols=2,
-        specs=[[{}, {}], [{"colspan": 2}, None]],
-        subplot_titles=("I / Q", "Constellation", "Spectrum"),
-        vertical_spacing=0.12,
+        specs=specs,
+        subplot_titles=titles,
+        vertical_spacing=0.12 * 2 / len(specs),
     )
     shown = iq[:config.max_plot_samples]
     _add_time_traces(figure, shown, config)
     _add_constellation(figure, shown)
     _add_spectrum(figure, iq, config)
-    figure.update_layout(height=800, template="plotly_white")
+    if gaps is not None:
+        gap_plotting.add_gap_view(figure, iq, gaps, config, row=3)
+    figure.update_layout(height=400 * len(specs), template="plotly_white")
     return figure
 
 

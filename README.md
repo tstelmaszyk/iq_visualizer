@@ -34,6 +34,7 @@ The CSV file contains one row per sample, with an I column and a Q column.
 | `--scale` | `db` or `linear` | `db` |
 | `--max-points` | points plotted in the time and constellation views | `10000` |
 | `--save` | save the figure as HTML | none |
+| `--check-tone` | the signal is a reference tone: report the gaps | no |
 
 Example for a European-style CSV (semicolon separator, decimal comma) with a
 header:
@@ -48,6 +49,34 @@ Default values can be changed in `iq_visualizer/config.py`.
 
 The spectrum is normalized: a complex sinusoid of amplitude 1 gives a peak of
 1 in linear scale, i.e. 0 dB.
+
+## Tone gap check
+
+When the capture is a known reference tone, `--check-tone` looks for lost
+or corrupted samples:
+
+```bash
+.venv/bin/python -m iq_visualizer.main capture.csv --fs 1e6 --check-tone
+```
+
+```
+Tone check: 2 gap(s) detected.
+  samples 32-32 (1 samples), t = 3.2e-05 s
+  samples 1790-3583 (1794 samples), t = 0.00179 s
+```
+
+A clean tone advances by the same phase step at every sample and keeps a
+constant amplitude. A sample that breaks either rule (phase step off by more
+than 5°, amplitude off by more than 10 %) is faulty, and consecutive faulty
+samples form one gap. The expected step and amplitude are estimated from the
+signal itself (medians over the rotating samples), so neither the tone
+frequency nor its amplitude has to be given.
+
+The exit code is 1 when at least one gap is found. The figure gets an extra
+"Tone gaps" view: I/Q over the whole signal with each gap highlighted in red.
+
+The check lives in `iq_visualizer/tone_check.py` (`ToneChecker`, tolerances
+in its constructor) and the view in `iq_visualizer/gap_plotting.py`.
 
 ## Adding an IQ source
 

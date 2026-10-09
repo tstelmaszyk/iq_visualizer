@@ -33,6 +33,7 @@ class VisualizerConfig:
     scale: Literal["db", "linear"] = "db"
     max_plot_samples: int = 10_000        # plotted points (time, IQ)
     output_html: Optional[Path] = None    # optional output file
+    check_tone: bool = False              # look for gaps in a tone
 
     def __post_init__(self) -> None:
         if self.sample_rate is not None and self.sample_rate <= 0:

@@ -33,14 +33,14 @@ def test_parse_args_fills_all_options():
         "data.csv", "--sep", ";", "--decimal", ",", "--header",
         "--i-col", "2", "--q-col", "3", "--fs", "1e6", "--nfft", "1024",
         "--window", "rectangular", "--scale", "linear",
-        "--max-points", "500", "--save", "out.html",
+        "--max-points", "500", "--save", "out.html", "--check-tone",
     ])
     assert csv_config == CsvConfig(
         path=Path("data.csv"), separator=";", decimal=",", has_header=True,
         i_column=2, q_column=3)
     assert vis_config == VisualizerConfig(
         sample_rate=1e6, nfft=1024, window="rectangular", scale="linear",
-        max_plot_samples=500, output_html=Path("out.html"))
+        max_plot_samples=500, output_html=Path("out.html"), check_tone=True)
 
 
 @pytest.mark.parametrize("alias, separator", [
@@ -78,3 +78,32 @@ def test_main_reports_invalid_option_value(tmp_path, capsys):
 def test_main_reports_os_errors_without_traceback(tmp_path, capsys):
     assert main([str(tmp_path)]) == 1  # a directory instead of a file
     assert "Error" in capsys.readouterr().err
+
+
+def test_parse_args_enables_tone_check():
+    _, vis_config = parse_args(["data.csv", "--check-tone"])
+    assert vis_config.check_tone
+
+
+def write_tone(path, n_samples):
+    iq = 1000 * np.exp(2j * np.pi * np.arange(n_samples) / 16)
+    np.savetxt(path, np.column_stack((iq.real, iq.imag)), delimiter=",")
+
+
+def test_main_tone_check_passes_on_a_clean_tone(tmp_path, capsys,
+                                                no_browser):
+    path = tmp_path / "iq.csv"
+    write_tone(path, 200)
+    assert main([str(path), "--check-tone"]) == 0
+    assert "no gap detected" in capsys.readouterr().out
+    assert len(no_browser) == 1
+
+
+def test_main_tone_check_fails_on_gaps(tmp_path, capsys, no_browser):
+    path = tmp_path / "iq.csv"
+    write_tone(path, 200)
+    lines = path.read_text().splitlines()
+    path.write_text("\n".join(lines[:50] + lines[53:]) + "\n")
+    assert main([str(path), "--check-tone"]) == 1
+    assert "1 gap(s) detected" in capsys.readouterr().out
+    assert len(no_browser) == 1
