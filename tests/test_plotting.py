@@ -46,6 +46,11 @@ def test_figure_uses_dark_blue_theme():
     assert figure.layout.plot_bgcolor == PLOT_COLOR
 
 
+def test_figure_hides_legend():
+    figure = build_figure(np.ones(16, dtype=complex), VisualizerConfig())
+    assert figure.layout.showlegend is False
+
+
 def test_constellation_markers_are_enlarged():
     figure = build_figure(np.ones(16, dtype=complex), VisualizerConfig())
     constellation = figure.data[2]

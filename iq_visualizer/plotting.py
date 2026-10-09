@@ -53,7 +53,8 @@ def build_figure(iq: np.ndarray, config: VisualizerConfig,
     if gaps is not None:
         gap_plotting.add_gap_view(figure, iq, gaps, config, row=3)
     figure.update_layout(height=400 * len(specs), template="plotly_dark",
-                         paper_bgcolor=PAPER_COLOR, plot_bgcolor=PLOT_COLOR)
+                         paper_bgcolor=PAPER_COLOR, plot_bgcolor=PLOT_COLOR,
+                         showlegend=False)
     figure.update_xaxes(gridcolor=GRID_COLOR, zerolinecolor=GRID_COLOR)
     figure.update_yaxes(gridcolor=GRID_COLOR, zerolinecolor=GRID_COLOR)
     return figure
