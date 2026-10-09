@@ -40,3 +40,16 @@ def test_gaps_are_highlighted_in_seconds_when_sample_rate_is_known():
 def test_no_gap_view_without_gaps():
     figure = build_figure(np.ones(16, dtype=complex), VisualizerConfig())
     assert "xaxis4" not in figure.layout
+
+
+def test_gap_view_leaves_a_vertical_margin_around_the_signal():
+    iq = np.array([-1.0, 1.0, 0.5j, -0.5j])
+    figure = build_figure(iq, VisualizerConfig(), gaps=[Gap(1, 2)])
+    assert tuple(figure.layout.yaxis4.range) == (-1.2, 1.2)
+
+
+def test_gap_view_margin_survives_a_constant_signal():
+    figure = build_figure(np.ones(16, dtype=complex), VisualizerConfig(),
+                          gaps=[Gap(1, 2)])
+    low, high = figure.layout.yaxis4.range
+    assert low < 1.0 < high

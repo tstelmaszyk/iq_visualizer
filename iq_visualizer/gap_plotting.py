@@ -16,6 +16,9 @@ from iq_visualizer.tone_check import Gap
 TITLE = "Tone gaps"
 # Border in pixels: keeps a short gap visible when the whole signal is shown
 GAP_LINE_WIDTH = 3
+# Headroom above and below the signal, as a fraction of its span: the curve
+# no longer touches the plot edges, which eases box-zoom selections
+Y_MARGIN = 0.1
 
 
 def add_gap_view(figure: go.Figure, iq: np.ndarray, gaps: List[Gap],
@@ -35,4 +38,14 @@ def add_gap_view(figure: go.Figure, iq: np.ndarray, gaps: List[Gap],
 
     x_label = "Sample" if config.sample_rate is None else "Time (s)"
     figure.update_xaxes(title_text=x_label, row=row, col=1)
-    figure.update_yaxes(title_text="Amplitude", row=row, col=1)
+    figure.update_yaxes(title_text="Amplitude", range=_y_range(iq),
+                         row=row, col=1)
+
+
+def _y_range(iq: np.ndarray) -> List[float]:
+    """Signal extent on I and Q, widened by Y_MARGIN on each side."""
+    low = float(min(iq.real.min(), iq.imag.min()))
+    high = float(max(iq.real.max(), iq.imag.max()))
+    # A constant signal has no span: fall back to its level (or 1)
+    margin = Y_MARGIN * ((high - low) or max(abs(high), 1.0))
+    return [low - margin, high + margin]
