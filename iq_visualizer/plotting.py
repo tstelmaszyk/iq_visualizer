@@ -16,6 +16,16 @@ PAPER_COLOR = "#0b1426"   # around the plots
 PLOT_COLOR = "#101d36"    # plot areas, slightly lighter
 GRID_COLOR = "#22324f"
 
+# --- Cosmetic only: page background -------------------------------------
+# The HTML page around the figure stays white; this JavaScript, run after
+# the figure is drawn (`post_script` of show()/write_html()), paints it in
+# the figure color. Not needed for the IQ analysis: removing it only takes
+# this constant and its two uses in main.run().
+PAGE_BACKGROUND_SCRIPT = (
+    "document.body.style.backgroundColor = '%s';" % PAPER_COLOR
+)
+# -------------------------------------------------------------------------
+
 
 def build_figure(iq: np.ndarray, config: VisualizerConfig,
                  gaps: Optional[List[Gap]] = None) -> go.Figure:

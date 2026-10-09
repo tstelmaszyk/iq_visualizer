@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from iq_visualizer.config import CsvConfig, VisualizerConfig
-from iq_visualizer.plotting import build_figure
+from iq_visualizer.plotting import PAGE_BACKGROUND_SCRIPT, build_figure
 from iq_visualizer.processing import SCALES, WINDOWS
 from iq_visualizer.sources import CsvIQSource, IQSource
 from iq_visualizer.tone_check import Gap, ToneChecker, format_report
@@ -108,9 +108,11 @@ def run(source: IQSource, config: VisualizerConfig) -> List[Gap]:
         gaps = ToneChecker().find_gaps(iq)
         print(format_report(gaps, config.sample_rate))
     figure = build_figure(iq, config, gaps)
+    # post_script: cosmetic page background (plotting.PAGE_BACKGROUND_SCRIPT)
     if config.output_html is not None:
-        figure.write_html(str(config.output_html))
-    figure.show()
+        figure.write_html(str(config.output_html),
+                          post_script=PAGE_BACKGROUND_SCRIPT)
+    figure.show(post_script=PAGE_BACKGROUND_SCRIPT)
     return gaps or []
 
 

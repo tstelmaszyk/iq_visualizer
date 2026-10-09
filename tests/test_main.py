@@ -6,6 +6,7 @@ import pytest
 
 from iq_visualizer.config import CsvConfig, VisualizerConfig
 from iq_visualizer.main import main, parse_args, run
+from iq_visualizer.plotting import PAGE_BACKGROUND_SCRIPT
 from iq_visualizer.sources import IQSource
 
 
@@ -16,9 +17,13 @@ class FakeSource(IQSource):
 
 @pytest.fixture
 def no_browser(monkeypatch):
-    """Prevents fig.show() from opening a browser during tests."""
+    """Prevents fig.show() from opening a browser during tests.
+
+    Records the keyword arguments of each call.
+    """
     shown = []
-    monkeypatch.setattr(go.Figure, "show", lambda self: shown.append(self))
+    monkeypatch.setattr(go.Figure, "show",
+                        lambda self, **kwargs: shown.append(kwargs))
     return shown
 
 
@@ -56,6 +61,13 @@ def test_run_shows_figure_and_writes_html(tmp_path, no_browser):
     run(FakeSource(), VisualizerConfig(output_html=output))
     assert len(no_browser) == 1
     assert "<html>" in output.read_text()
+
+
+def test_run_paints_page_background(tmp_path, no_browser):
+    output = tmp_path / "out.html"
+    run(FakeSource(), VisualizerConfig(output_html=output))
+    assert no_browser[0]["post_script"] == PAGE_BACKGROUND_SCRIPT
+    assert PAGE_BACKGROUND_SCRIPT in output.read_text()
 
 
 def test_main_runs_on_a_csv_file(tmp_path, no_browser):

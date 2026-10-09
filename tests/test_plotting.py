@@ -1,7 +1,8 @@
 import numpy as np
 
 from iq_visualizer.config import VisualizerConfig
-from iq_visualizer.plotting import PAPER_COLOR, PLOT_COLOR, build_figure
+from iq_visualizer.plotting import (PAGE_BACKGROUND_SCRIPT, PAPER_COLOR,
+                                    PLOT_COLOR, build_figure)
 
 
 def test_figure_has_time_constellation_and_spectrum_traces():
@@ -50,3 +51,7 @@ def test_constellation_markers_are_enlarged():
     constellation = figure.data[2]
     assert constellation.marker.size == 6
     assert constellation.marker.opacity == 0.6
+
+
+def test_page_background_script_uses_paper_color():
+    assert PAPER_COLOR in PAGE_BACKGROUND_SCRIPT
